@@ -1,0 +1,44 @@
+spring:
+  application:
+    # 애플리케이션 이름
+    name: mini-order-service
+
+  datasource:
+    # H2 In-Memory DB
+    # Embedded Mode 사용 시:
+    # jdbc:h2:~/miniorder
+    url: jdbc:h2:mem:miniorder
+
+    # H2 드라이버
+    driver-class-name: org.h2.Driver
+
+    # DB 계정
+    username: sa
+
+    # DB 비밀번호
+    password:
+
+  h2:
+    console:
+      # H2 콘솔 활성화
+      enabled: true
+
+      # 접속 주소: /h2-console
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      # 테이블 자동 생성
+      # create: 실행 시 테이블 재생성
+      # update: 변경 사항만 반영
+      # validate: 테이블 검증
+      # none: 자동 생성 안 함
+      ddl-auto: create
+
+    # 실행 SQL 출력
+    show-sql: true
+
+    properties:
+      hibernate:
+        # SQL 정렬 출력
+        format_sql: true
