@@ -1,6 +1,7 @@
 package com.sparta.miniorderservice.product;
 
 import com.sparta.miniorderservice.product.dto.ProductCreateRequest;
+import com.sparta.miniorderservice.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,5 +16,10 @@ public class ProductController {
     @PostMapping
     public void createProduct(@RequestBody ProductCreateRequest request) {
         productService.createProduct(request);
+    }
+
+    @GetMapping("/{productId}")
+    public ProductResponse getProduct(@PathVariable Long productId) {
+        return productService.getProduct(productId);
     }
 }
