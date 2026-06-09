@@ -1,16 +1,16 @@
 package com.sparta.miniorderservice.product;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+
 //객체 내부 속성에 직접 접근하지 않아 객체의 정보 은닉을 가능하게 해주어 보안을 강화할 수 있고, 코드의 안전성과 유지보수성을 높일 수 있는 장점
 @Getter
+
 //파라미터가 없는 디폴트 생성자를 생성
 @NoArgsConstructor
 /*
@@ -35,6 +35,9 @@ public class Product {
     // 상품 등록일
     private LocalDateTime createdAt;
 
+    // 상품 마지막 수정일
+    private LocalDateTime updatedAt;
+
     // 노출 여부
     private boolean visible;
 
@@ -43,6 +46,7 @@ public class Product {
         this.name = name;
         this.price = price;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
         this.visible = true;
     }
 
@@ -50,10 +54,12 @@ public class Product {
     public void update(String name, int price) {
         this.name = name;
         this.price = price;
+        this.updatedAt = LocalDateTime.now();
     }
 
     // 상품 삭제 대신 숨김 처리
     public void hide() {
         this.visible = false;
+        this.updatedAt = LocalDateTime.now();
     }
 }
