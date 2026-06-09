@@ -2,6 +2,7 @@ package com.sparta.miniorderservice.product;
 
 import com.sparta.miniorderservice.product.dto.ProductCreateRequest;
 import com.sparta.miniorderservice.product.dto.ProductResponse;
+import com.sparta.miniorderservice.product.dto.ProductUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +14,30 @@ public class ProductController {
 
     private final ProductService productService;
 
+    //상품 생성 API
     @PostMapping
     public void createProduct(@RequestBody ProductCreateRequest request) {
         productService.createProduct(request);
     }
 
+    //상품 조회 API
     @GetMapping("/{productId}")
     public ProductResponse getProduct(@PathVariable Long productId) {
         return productService.getProduct(productId);
+    }
+
+    //상품 수정 API
+    @PutMapping("/{productId}")
+    public void updateProduct(
+            @PathVariable Long productId,
+            @RequestBody ProductUpdateRequest request
+    ) {
+        productService.updateProduct(productId, request);
+    }
+
+    //상품 삭제(숨김처리) API
+    @DeleteMapping("/{productId}")
+    public void deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
     }
 }
