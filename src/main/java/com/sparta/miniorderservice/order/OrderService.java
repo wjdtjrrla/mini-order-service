@@ -1,0 +1,37 @@
+package com.sparta.miniorderservice.order;
+
+import com.sparta.miniorderservice.order.dto.OrderCreateRequest;
+import com.sparta.miniorderservice.order.dto.OrderResponse;
+import com.sparta.miniorderservice.product.Product;
+import com.sparta.miniorderservice.product.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+
+    // 주문 생성
+    public void createOrder(OrderCreateRequest request) {
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        Order order = new Order(product);
+
+        orderRepository.save(order);
+    }
+
+    // 주문 단건 조회
+    @Transactional(readOnly = true)
+    public OrderResponse getOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+        return new OrderResponse(order);
+    }
+}
