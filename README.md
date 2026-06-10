@@ -28,7 +28,7 @@ Spring Boot와 JPA를 공부하기 위해 시작한 미니 프로젝트.
 
 ---
 
-## 현재 진행 상황
+
 
 ### 프로젝트 생성
 
@@ -215,7 +215,146 @@ DELETE /products/{id}
 * visible 값을 false로 변경
 
 ---
+## 3일차 진행 내용
 
+### Product 기능 보완
+
+#### 상품 재노출 기능
+
+숨김 처리된 상품을 다시 노출할 수 있도록 구현.
+
+구현 API
+
+```http
+PATCH /products/{id}/show
+```
+
+---
+
+#### 실제 삭제 기능
+
+기존에는 숨김 기능만 존재했지만,
+실제 DB에서 삭제하는 기능도 추가.
+
+구현 API
+
+```http
+DELETE /products/{id}
+```
+
+---
+
+#### 상품 목록 조회
+
+구현 API
+
+```http
+GET /products
+GET /products?visible=true
+GET /products?visible=false
+```
+
+학습 내용
+
+* @RequestParam 사용
+* 조건 조회 구현
+* Spring Data JPA Query Method 사용
+
+예시
+
+```java
+findAllByVisible(boolean visible)
+```
+
+---
+
+### 주문 생성(Create)
+
+구현 API
+
+```http
+POST /orders
+```
+
+요청 데이터
+
+```json
+{
+  "productId": 1
+}
+```
+
+학습 내용
+
+* 상품 ID를 이용하여 주문 생성
+* Product 조회 후 Order 생성
+* 주문 당시 상품 가격을 Order에 저장
+
+고민한 내용
+
+상품 가격을 요청 데이터로 받을지,
+Product에서 조회할지 고민.
+
+선택
+
+```java
+product.getPrice()
+```
+
+주문 생성 당시 가격을 저장하도록 구현.
+
+---
+
+### 주문 단건 조회(Read)
+
+구현 API
+
+```http
+GET /orders/{id}
+```
+
+응답 예시
+
+```json
+{
+  "orderId": 1,
+  "productId": 1,
+  "productName": "콜라",
+  "orderPrice": 2000,
+  "status": "ORDERED"
+}
+```
+
+학습 내용
+
+* OrderResponse DTO 생성
+* 연관관계를 이용하여 상품명 조회
+
+```java
+order.getProduct().getName()
+```
+
+---
+
+
+
+### Product
+
+* 상품 등록(Create) 완료
+* 상품 단건 조회(Read) 완료
+* 상품 목록 조회(Read All) 완료
+* 상품 수정(Update) 완료
+* 상품 숨김 처리 완료
+* 상품 재노출 완료
+* 상품 실제 삭제 완료
+
+### Order
+
+* 주문 생성(Create) 완료
+* 주문 단건 조회(Read) 완료
+
+
+---
 ## 공부하면서 알게 된 점
 
 ### 왜 생성자를 사용할까?
@@ -244,7 +383,7 @@ JPA가 트랜잭션 안에서 변경된 엔티티를 감지하여 자동으로 U
 
 ### Soft Delete란?
 
-실제 삭제하지 않고 상태만 변경하는 방식.
+실제 삭제하지 않고 상태만 변경하는 방식. Hibernate 방식을 많이 사용한다고 함.
 
 현재 프로젝트에서는
 
@@ -254,13 +393,48 @@ visible = false
 
 를 통해 구현.
 
+### Query Method란?
+
+Spring Data JPA는 메서드 이름만으로 조회 쿼리를 생성.
+
+예시
+
+```java
+findAllByVisible(boolean visible)
+```
+
 ---
 
-## 다음 목표
+### @RequestParam이란?
 
-* Product 목록 조회 구현
-* visible 조건 조회 구현
-* Order Repository 작성
-* 주문 생성 기능 구현
-* 주문 조회 기능 구현
-* Product와 Order 연관관계 활용하기
+요청 파라미터를 받아 조건 조회를 구현.
+
+예시
+
+```java
+@GetMapping
+public List<ProductResponse> getProducts(
+        @RequestParam(required = false) Boolean visible
+)
+```
+
+---
+
+### 주문 가격은 왜 Order에 저장할까?
+
+주문 이후 상품 가격이 변경될 수 있기 때문.
+
+예시
+
+```text
+주문 시점 가격 : 2000원
+상품 가격 변경 : 3000원
+```
+
+주문 조회 시에는
+
+```text
+2000원
+```
+
+이 보여야 해서 주문 생성 시 Product의 가격을 Order에 저장하도록 설계.
