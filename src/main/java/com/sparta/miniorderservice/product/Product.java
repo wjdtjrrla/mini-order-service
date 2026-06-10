@@ -62,4 +62,10 @@ public class Product {
         this.visible = false;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 숨겼던 상품 다시 노출
+    public void show(){
+        this.visible = true;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

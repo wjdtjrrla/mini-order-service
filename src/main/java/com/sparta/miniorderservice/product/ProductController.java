@@ -35,9 +35,21 @@ public class ProductController {
         productService.updateProduct(productId, request);
     }
 
-    //상품 삭제(숨김처리) API
+    //상품 비활성화(숨김처리) API
+    @PatchMapping("/{productId}/hide")
+    public void hideProduct(@PathVariable Long productId) {
+        productService.hideProduct(productId);
+    }
+
+    //상품 활성화
+    @PatchMapping("/{productId}/show")
+    public void showProduct(@PathVariable Long productId){
+        productService.showProduct(productId);
+    }
+
     @DeleteMapping("/{productId}")
-    public void deleteProduct(@PathVariable Long productId) {
+
+    public void deleteProduct(@PathVariable Long productId){
         productService.deleteProduct(productId);
     }
 }

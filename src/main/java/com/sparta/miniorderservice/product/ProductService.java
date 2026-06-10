@@ -41,11 +41,27 @@ public class ProductService {
         product.update(request.getName(), request.getPrice());
     }
 
-    //상품 삭제(숨김 처리)
-    public void deleteProduct(Long productId) {
+    //상품 비활성화(숨김 처리)
+    public void hideProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         product.hide();
+    }
+
+    //상품 활성화(숨겼던 상품 노출)
+    public void showProduct(Long productId){
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다"));
+
+        product.show();
+    }
+
+    //상품 삭제
+    public void deleteProduct(Long productId){
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다"));
+
+        productRepository.delete(product);
     }
 }
