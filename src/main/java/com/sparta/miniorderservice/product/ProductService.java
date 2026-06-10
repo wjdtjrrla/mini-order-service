@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.sparta.miniorderservice.product.dto.ProductResponse;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor //Lombok 라이브러리에서 제공하는 어노테이션, 필수 인자를 가진 생성자를 자동으로 생성 (final로 표시)
 @Transactional
@@ -63,5 +65,21 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다"));
 
         productRepository.delete(product);
+    }
+
+    //상품 목록 조회
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getProducts(Boolean visible) {
+        List<Product> products;
+
+        if (visible == null) {
+            products = productRepository.findAll();
+        } else {
+            products = productRepository.findAllByVisible(visible);
+        }
+
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
     }
 }

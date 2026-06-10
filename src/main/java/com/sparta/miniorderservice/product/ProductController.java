@@ -6,6 +6,8 @@ import com.sparta.miniorderservice.product.dto.ProductUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController //JSON 반환, XML 반환, API 서버 개발
 //@Controller : HTML 화면 반환, JSP 반환 Thymeleaf 반환
 @RequiredArgsConstructor //Lombok 라이브러리에서 제공하는 어노테이션, 필수 인자를 가진 생성자를 자동으로 생성 (final로 표시)
@@ -20,10 +22,19 @@ public class ProductController {
         productService.createProduct(request);
     }
 
-    //상품 조회 API
+    //상품 단건 조회 API
     @GetMapping("/{productId}")
     public ProductResponse getProduct(@PathVariable Long productId) {
         return productService.getProduct(productId);
+    }
+
+    //상품 목록 조회
+    @GetMapping
+    public List<ProductResponse> getProducts(
+            //URL의 파라미터를 가져오는 어노테이션
+            @RequestParam(required = false) Boolean visible
+    ) {
+        return productService.getProducts(visible);
     }
 
     //상품 수정 API
@@ -47,8 +58,8 @@ public class ProductController {
         productService.showProduct(productId);
     }
 
+    //상품 삭제
     @DeleteMapping("/{productId}")
-
     public void deleteProduct(@PathVariable Long productId){
         productService.deleteProduct(productId);
     }
