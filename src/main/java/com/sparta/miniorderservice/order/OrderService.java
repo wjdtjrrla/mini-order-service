@@ -1,12 +1,15 @@
 package com.sparta.miniorderservice.order;
 
 import com.sparta.miniorderservice.order.dto.OrderCreateRequest;
+import com.sparta.miniorderservice.order.dto.OrderListResponse;
 import com.sparta.miniorderservice.order.dto.OrderResponse;
 import com.sparta.miniorderservice.product.Product;
 import com.sparta.miniorderservice.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,5 +36,15 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
         return new OrderResponse(order);
+    }
+
+    // 주문 목록 조회
+    @Transactional(readOnly = true)
+    public List<OrderListResponse> getOrders() {
+        //N+1 문제 우려
+        return orderRepository.findAll()
+                .stream()
+                .map(OrderListResponse::new)
+                .toList();
     }
 }

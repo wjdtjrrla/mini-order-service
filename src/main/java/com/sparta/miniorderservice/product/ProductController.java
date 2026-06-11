@@ -31,7 +31,7 @@ public class ProductController {
     //상품 목록 조회
     @GetMapping
     public List<ProductResponse> getProducts(
-            //URL의 파라미터를 가져오는 어노테이션
+            //URL 뒤의 Query Parameter를 가져오는 어노테이션
             @RequestParam(required = false) Boolean visible
     ) {
         return productService.getProducts(visible);
