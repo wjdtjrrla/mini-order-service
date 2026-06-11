@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+//import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class OrderService {
     }
 
     // 주문 목록 조회
+    /*
     @Transactional(readOnly = true)
     public List<OrderListResponse> getOrders() {
         //N+1 문제 우려
@@ -46,5 +49,13 @@ public class OrderService {
                 .stream()
                 .map(OrderListResponse::new)
                 .toList();
+    }
+    */
+
+    //주문 목록 페이지네이션
+    @Transactional(readOnly = true)
+    public Page<OrderListResponse> getOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(OrderListResponse::new);
     }
 }

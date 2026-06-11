@@ -6,7 +6,9 @@ import com.sparta.miniorderservice.order.dto.OrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+//import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,8 +32,15 @@ public class OrderController {
     }
 
     //주문 목록 조회
-    @GetMapping
+    /*@GetMapping
     public List<OrderListResponse> getOrders(){
         return orderService.getOrders();
+    }
+    */
+
+    //주문 목록 페이지네이션
+    @GetMapping
+    public Page<OrderListResponse> getOrders(Pageable pageable) {
+        return orderService.getOrders(pageable);
     }
 }
