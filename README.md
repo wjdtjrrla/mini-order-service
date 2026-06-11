@@ -353,9 +353,193 @@ order.getProduct().getName()
 * 주문 생성(Create) 완료
 * 주문 단건 조회(Read) 완료
 
+---
+## 4일차 진행 내용
+
+### 주문 목록 조회(Read All)
+
+구현 API
+
+```http
+GET /orders
+GET /orders?page=0&size=10
+```
+
+응답 예시
+
+```json
+{
+  "content": [
+    {
+      "orderId": 1,
+      "productName": "콜라",
+      "orderPrice": 2000,
+      "status": "ORDERED"
+    }
+  ],
+  "totalElements": 5,
+  "totalPages": 1
+}
+```
 
 ---
-## 공부하면서 알게 된 점
+
+### 페이지네이션(Pageable) 적용
+
+기존에는 모든 주문을 한 번에 조회하도록 구현.
+
+```java
+orderRepository.findAll()
+```
+
+주문 데이터가 많아질 경우 성능 문제가 발생할 수 있다고 판단하여 페이지네이션을 적용.
+
+적용 코드
+
+```java
+Page<Order> findAll(Pageable pageable)
+```
+
+학습 내용
+
+* Pageable 사용
+* Page 객체 반환
+* 페이지 번호는 0부터 시작
+* size를 통해 조회 개수 조절 가능
+* 기본 size 값은 20
+
+예시
+
+```http
+GET /orders?page=0&size=10
+```
+
+---
+
+### 주문 목록 응답 DTO 설계
+
+주문 목록에서는 필요한 정보만 조회하도록 설계.
+
+선택한 필드
+
+```text
+orderId
+productName
+orderPrice
+status
+```
+
+고민한 내용
+
+```text
+productId를 응답에 포함할 것인가?
+```
+
+현재 목록 조회에서는 상품 상세 조회 기능이 없고,
+사용자 입장에서 상품명을 확인하는 것이 더 중요하다고 판단하여 제외.
+
+---
+
+### N+1 문제 확인
+
+주문 목록 조회 구현 후 Hibernate SQL 로그를 확인.
+
+조회 시 발생한 쿼리
+
+```sql
+select * from orders
+
+select * from product where id=?
+select * from product where id=?
+select * from product where id=?
+```
+
+문제점
+
+```text
+Order 조회 1번
+
++
+Product 조회 N번
+```
+
+주문 수가 많아질수록 추가 조회가 계속 발생하는 구조.
+
+---
+
+### Fetch Join 적용
+
+N+1 문제를 해결하기 위해 Fetch Join 적용.
+
+적용 코드
+
+```java
+@Query(
+        value = "select o from Order o join fetch o.product",
+        countQuery = "select count(o) from Order o"
+)
+Page<Order> findAllWithProduct(Pageable pageable);
+```
+
+Service 수정
+
+```java
+orderRepository.findAllWithProduct(pageable)
+```
+
+---
+
+### Fetch Join 적용 후 SQL
+
+적용 후 SQL
+
+```sql
+select
+    o.id,
+    o.order_price,
+    p.id,
+    p.name
+from orders o
+join product p
+    on p.id = o.product_id
+```
+
+결과
+
+```text
+Order 조회
++
+Product 조회
+
+한 번에 수행
+```
+
+N+1 문제 해결 완료.
+
+---
+
+### 현재 진행 상황
+
+#### Product
+
+* 상품 등록(Create) 완료
+* 상품 단건 조회(Read) 완료
+* 상품 목록 조회(Read All) 완료
+* 상품 수정(Update) 완료
+* 상품 숨김 처리 완료
+* 상품 재노출 완료
+* 상품 실제 삭제 완료
+
+#### Order
+
+* 주문 생성(Create) 완료
+* 주문 단건 조회(Read) 완료
+* 주문 목록 조회(Read All) 완료
+* 페이지네이션 적용 완료
+* Fetch Join 적용 완료
+* N+1 문제 해결 완료
+---
+# 공부하면서 알게 된 점
 
 ### 왜 생성자를 사용할까?
 
@@ -438,3 +622,65 @@ public List<ProductResponse> getProducts(
 ```
 
 이 보여야 해서 주문 생성 시 Product의 가격을 Order에 저장하도록 설계.
+
+---
+### Pageable이란?
+
+대량의 데이터를 한 번에 조회하지 않고
+페이지 단위로 나누어 조회하기 위한 기능.
+
+예시
+
+```http
+GET /orders?page=0&size=10
+```
+
+page = 페이지 번호
+
+size = 조회 개수
+
+---
+
+### N+1 문제란?
+
+연관 엔티티 조회 시
+
+1번의 조회 쿼리 이후
+연관 객체를 조회하기 위해 추가 쿼리가 N번 발생하는 문제.
+
+예시
+
+```text
+Order 조회 1번
+
++
+Product 조회 N번
+```
+
+해결 방법
+
+* Fetch Join
+* EntityGraph
+* Batch Size
+* DTO Projection
+
+---
+
+### Fetch Join이란?
+
+연관된 엔티티를 조회할 때 JOIN을 사용하여
+한 번의 쿼리로 함께 조회하는 방법.
+
+예시
+
+```java
+@Query("select o from Order o join fetch o.product")
+```
+
+장점
+
+* N+1 문제 해결
+* 조회 성능 향상
+* 연관 엔티티를 즉시 조회 가능
+
+현재 프로젝트에서는 Order와 Product를 함께 조회하기 위해 사용.
