@@ -55,7 +55,13 @@ public class OrderService {
     //주문 목록 페이지네이션
     @Transactional(readOnly = true)
     public Page<OrderListResponse> getOrders(Pageable pageable) {
+        /*
         return orderRepository.findAll(pageable)
+                .map(OrderListResponse::new);
+         */
+
+        //N+1 문제 해결 위한
+        return orderRepository.findAllWithProduct(pageable)
                 .map(OrderListResponse::new);
     }
 }
