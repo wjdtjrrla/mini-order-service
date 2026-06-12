@@ -41,10 +41,14 @@ public class Product {
     // 노출 여부
     private boolean visible;
 
+    // 재고 개수
+    private int stock;
+
     // 상품 생성 시 사용자가 입력하는 값은 name, price만
-    public Product(String name, int price) {
+    public Product(String name, int price, int stock) {
         this.name = name;
         this.price = price;
+        this.stock = stock;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.visible = true;
@@ -66,6 +70,16 @@ public class Product {
     // 숨겼던 상품 다시 노출
     public void show(){
         this.visible = true;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 재고 차감
+    public void decreaseStock(){
+        if(this.stock <= 0){
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+
+        this.stock -= 1;
         this.updatedAt = LocalDateTime.now();
     }
 }

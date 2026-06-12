@@ -20,7 +20,7 @@ public class ProductService {
     // 상품 등록
     // 반환할 필요가 없으면 void
     public void createProduct(ProductCreateRequest request) {
-        Product product = new Product(request.getName(), request.getPrice());
+        Product product = new Product(request.getName(), request.getPrice(), request.getStock());
 
         productRepository.save(product);
     }

@@ -12,4 +12,7 @@ public class ProductCreateRequest {
 
     // 상품 가격
     private int price;
+
+    //재고 개수
+    private int stock;
 }
