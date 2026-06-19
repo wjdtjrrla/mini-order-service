@@ -23,7 +23,7 @@ public class OrderService {
 
     // 주문 생성
     public void createOrder(OrderCreateRequest request) {
-        Product product = productRepository.findById(request.getProductId())
+        Product product = productRepository.findByIdForUpdate(request.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         product.decreaseStock();
